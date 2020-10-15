@@ -2,9 +2,16 @@ package cool.zhangzihao;
 
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
+
 public class SmokeTest {
     @Test
     public void test() {
-        Crawler crawler = new Crawler(new SinaCrawlerConfig(), SinaCrawlerConfig.SINA_INIT_LINK_URL);
+        try {
+            Crawler crawler = new Crawler(new SinaCrawlerConfig());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            throw new RuntimeException(throwables);
+        }
     }
 }

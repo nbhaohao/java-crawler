@@ -11,51 +11,49 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Crawler {
     private CrawlerConfig crawlerConfig;
-    private LinkedList<String> linksPool;
-    private Set<String> processedSet;
 
     public Crawler(CrawlerConfig crawlerConfig) {
         this.crawlerConfig = crawlerConfig;
-        linksPool = new LinkedList<>();
-        processedSet = new HashSet<>();
     }
-
-    public Crawler(CrawlerConfig crawlerConfig, String... startLinks) {
-        this(crawlerConfig);
-        linksPool.addAll(Arrays.asList(startLinks));
-    }
-
 
     public void start() {
-        while (!this.isNoMoreLink()) {
-            String link = this.getFirstLinkAndRemoveIt();
-            if (this.isLinkProcessed(link)) {
-                continue;
-            }
-            if (crawlerConfig.isTargetPage(link)) {
-                String pageHtmlData = this.getPageData(link);
-                if (pageHtmlData != null) {
-                    Document document = Jsoup.parse(pageHtmlData);
-                    this.saveAllHrefsInPage(document);
-                    crawlerConfig.onParsePage(document);
+        try {
+            while (true) {
+                LinkedList<String> linksPool = new LinkedList<>(this.crawlerConfig.getInitToBeProcessedLinks());
+                if (linksPool.isEmpty()) {
+                    break;
                 }
-                this.addLinkToProcessedSet(link);
-                continue;
+                String link = this.getFirstLinkAndRemoveIt(linksPool);
+                if (crawlerConfig.isLinkProcessed(link)) {
+                    continue;
+                }
+                if (crawlerConfig.isTargetPage(link)) {
+                    String pageHtmlData = this.getPageData(link);
+                    if (pageHtmlData != null) {
+                        Document document = Jsoup.parse(pageHtmlData);
+                        this.saveAllHrefsInPage(document);
+                        crawlerConfig.onParsePage(document, link);
+                    }
+                    this.putLinkToProcessedPool(link);
+                    continue;
+                }
+                this.putLinkToProcessedPool(link);
             }
-            this.addLinkToProcessedSet(link);
+        } finally {
+            crawlerConfig.onCrawlerComplete();
         }
     }
 
     public void saveAllHrefsInPage(Document document) {
-        linksPool.addAll(document.select("a").stream().map(element -> element.attr("href")).collect(Collectors.toList()));
+        crawlerConfig.onPutAllHrefsToBeProcessedPoll(
+                document.select("a").stream().map(element -> element.attr("href"))
+                        .collect(Collectors.toList())
+        );
     }
 
     public String getPageData(String link) {
@@ -73,19 +71,13 @@ public class Crawler {
         return null;
     }
 
-    public void addLinkToProcessedSet(String link) {
-        processedSet.add(link);
+    public void putLinkToProcessedPool(String link) {
+        crawlerConfig.onPutProcessedLink(link);
     }
 
-    public String getFirstLinkAndRemoveIt() {
-        return linksPool.remove();
-    }
-
-    public boolean isLinkProcessed(String link) {
-        return processedSet.contains(link);
-    }
-
-    public boolean isNoMoreLink() {
-        return linksPool.isEmpty();
+    public String getFirstLinkAndRemoveIt(LinkedList<String> linksPool) {
+        String firstLink = linksPool.remove();
+        crawlerConfig.onPollLink(firstLink);
+        return firstLink;
     }
 }
