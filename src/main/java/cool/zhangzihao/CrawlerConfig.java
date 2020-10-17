@@ -2,7 +2,6 @@ package cool.zhangzihao;
 
 import org.jsoup.nodes.Document;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface CrawlerConfig {
