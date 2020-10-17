@@ -13,7 +13,11 @@
     * 使用 H2 数据库，使用 JDBC，做到可以断点续传功能。
 3. 接入 `Flyway`
     * 使用 `Flyway` 完成自动化初始化数据库环境。
-4. 介入 `MyBatis`
+4. 接入 `MyBatis`
     * 抽取 `DatabaseAccessObject` 将 JDBC 的代码抽取出来，抽取 `DAO` 接口，方便后续替换 JDBC 为 ORM。
     * 使用 `MyBatis` 用 ORM 的方式来重构之前的 JDBC 代码。
-    
+5. 使用 MySQL
+    * 使用 Docker 启动一个 MySQL 数据库，来代替之前的 H2 数据库。
+    * MySQL 中文乱码问题：
+        * 数据库使用 `alter database character set utf8mb4 collate utf8mb4_unicode_ci;`
+        * jdbc url 要携带相关参数， jdbc:mysql://localhost:3306/news?characterEncoding=utf8
