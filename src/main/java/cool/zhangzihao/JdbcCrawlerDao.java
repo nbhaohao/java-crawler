@@ -59,7 +59,6 @@ public class JdbcCrawlerDao implements CrawlerDao {
     }
 
 
-    @Override
     public void deleteLinkFromDB(String link) {
         try (PreparedStatement preparedStatement = connection.prepareStatement("delete from LINKS_TO_BE_PROCESSED where LINK = ?;")) {
             preparedStatement.setString(1, link);
@@ -87,8 +86,16 @@ public class JdbcCrawlerDao implements CrawlerDao {
         }
     }
 
+    @Override
+    public void insertLinkToBeProcessedTable(String link) {
+        insertLinkToTable("LINKS_TO_BE_PROCESSED", link);
+    }
 
     @Override
+    public void insertLinkToProcessedTable(String link) {
+        insertLinkToTable("LINKS_ALREADY_PROCESSED", link);
+    }
+
     public void insertLinkToTable(String tableName, String link) {
         try (PreparedStatement preparedStatement = connection.prepareStatement("insert into " + tableName + " (LINK) values (?);")) {
             preparedStatement.setString(1, link);
