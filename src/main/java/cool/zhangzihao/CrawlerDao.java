@@ -5,11 +5,11 @@ public interface CrawlerDao {
 
     void insertNewsToDatabase(String title, String article, String link);
 
-    void deleteLinkFromDB(String link);
-
     String getNextBeProcessedLinkFromDatabase();
 
-    void insertLinkToTable(String tableName, String link);
+    void insertLinkToBeProcessedTable(String link);
+
+    void insertLinkToProcessedTable(String link);
 
     boolean checkIsLinkExistFromDatabase(String link);
 }

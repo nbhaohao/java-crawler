@@ -7,7 +7,8 @@ import java.util.List;
 
 public class SinaCrawlerConfig implements CrawlerConfig {
     public static final String SINA_INIT_LINK_URL = "https://sina.cn";
-    private final CrawlerDao dao = new JdbcCrawlerDao();
+    //        private final CrawlerDao dao = new JdbcCrawlerDao();
+    private final CrawlerDao dao = new MyBatisCrawlerDao();
 
     @Override
     public boolean isTargetPage(String link) {
@@ -36,12 +37,12 @@ public class SinaCrawlerConfig implements CrawlerConfig {
 
     @Override
     public void onPutProcessedLink(String link) {
-        dao.insertLinkToTable("LINKS_ALREADY_PROCESSED", link);
+        dao.insertLinkToProcessedTable(link);
     }
 
     @Override
     public void onPutAllHrefsToBeProcessedPoll(List<String> links) {
-        links.forEach(link -> dao.insertLinkToTable("LINKS_TO_BE_PROCESSED", link));
+        links.forEach(dao::insertLinkToBeProcessedTable);
     }
 
     @Override

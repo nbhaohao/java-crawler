@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cool.zhangzihao.MyMapper">
+    <select id="selectNextBeProcessedLink" resultType="String">
+        select LINK
+        from LINKS_TO_BE_PROCESSED
+        limit 1;
+    </select>
+    <select id="selectLinkFromProcessedTable" resultType="int">
+        select count(LINK)
+        from LINKS_ALREADY_PROCESSED
+        where LINK = #{link};
+    </select>
+    <delete id="deleteLink" parameterType="String">
+        delete
+        from LINKS_TO_BE_PROCESSED
+        where LINK = #{link}
+    </delete>
+    <insert id="insertLink" parameterType="HashMap">
+        insert into
+        <choose>
+            <when test="tableName == 'LINKS_ALREADY_PROCESSED'">LINKS_ALREADY_PROCESSED</when>
+            <when test="tableName == 'LINKS_TO_BE_PROCESSED'">LINKS_TO_BE_PROCESSED</when>
+        </choose>
+        (LINK)values (#{link})
+    </insert>
+    <insert id="insertLinkToBeProcessedTable" parameterType="String">
+        insert into LINKS_TO_BE_PROCESSED (LINK)
+        values (#{link})
+    </insert>
+    <insert id="insertLinkToProcessedTable" parameterType="String">
+        insert into LINKS_ALREADY_PROCESSED (LINK)
+        values (#{link})
+    </insert>
+    <insert id="insertNews" parameterType="cool.zhangzihao.News">
+        insert into NEWS (TITLE, CONTENT, URL)
+        values (#{title}, #{content}, #{url})
+    </insert>
+</mapper>
