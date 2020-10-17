@@ -12,4 +12,8 @@
     * 介入 `SpotBugs Plugin`
     * 使用 H2 数据库，使用 JDBC，做到可以断点续传功能。
 3. 接入 `Flyway`
-    * 使用 `Flyway` 完成自动化初始化数据库环境
+    * 使用 `Flyway` 完成自动化初始化数据库环境。
+4. 介入 `MyBatis`
+    * 抽取 `DatabaseAccessObject` 将 JDBC 的代码抽取出来，抽取 `DAO` 接口，方便后续替换 JDBC 为 ORM。
+    * 使用 `MyBatis` 用 ORM 的方式来重构之前的 JDBC 代码。
+    

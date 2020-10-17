@@ -14,7 +14,7 @@ import java.io.UncheckedIOException;
 import java.util.stream.Collectors;
 
 public class Crawler {
-    private CrawlerConfig crawlerConfig;
+    private final CrawlerConfig crawlerConfig;
 
     public Crawler(CrawlerConfig crawlerConfig) {
         this.crawlerConfig = crawlerConfig;
@@ -44,7 +44,9 @@ public class Crawler {
 
     public void saveAllHrefsInPage(Document document) {
         crawlerConfig.onPutAllHrefsToBeProcessedPoll(
-                document.select("a").stream().map(element -> element.attr("href"))
+                document.select("a").stream()
+                        .map(element -> element.attr("href"))
+                        .filter(hrefString -> !hrefString.toLowerCase().equals("javascript:void(0)"))
                         .collect(Collectors.toList())
         );
     }
