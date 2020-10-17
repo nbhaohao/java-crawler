@@ -1,4 +1,3 @@
-use news;
 create table NEWS
 (
     id          bigint primary key auto_increment,
