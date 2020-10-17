@@ -12,7 +12,8 @@ public class SinaCrawlerConfig implements CrawlerConfig {
 
     @Override
     public boolean isTargetPage(String link) {
-        return (link.equals(SINA_INIT_LINK_URL) || link.contains("news.sina.cn")) && !link.contains("passport.sina.cn");
+//        return (link.equals(SINA_INIT_LINK_URL) || link.contains("news.sina.cn")) && !link.contains("passport.sina.cn");
+        return (link.equals(SINA_INIT_LINK_URL) || link.contains("sina.cn")) && !link.contains("passport.sina.cn");
     }
 
     @Override
