@@ -49,7 +49,7 @@ public class MyBatisCrawlerDao implements CrawlerDao {
     }
 
     @Override
-    public String getNextBeProcessedLinkFromDatabase() {
+    public synchronized String getNextBeProcessedLinkFromDatabase() {
         try (SqlSession session = sqlSessionFactory.openSession()) {
             String nextLink = session.selectOne(getMapperStatementName("selectNextBeProcessedLink"));
             if (nextLink != null) {

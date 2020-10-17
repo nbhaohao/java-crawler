@@ -3,7 +3,9 @@ package cool.zhangzihao;
 public class Main {
 
     public static void main(String[] args) {
-        Crawler crawler = new Crawler(new SinaCrawlerConfig());
-        crawler.start();
+        SinaCrawlerConfig sinaCrawlerConfig = new SinaCrawlerConfig();
+        for (int i = 0; i < 8; i++) {
+            new Crawler(sinaCrawlerConfig).start();
+        }
     }
 }

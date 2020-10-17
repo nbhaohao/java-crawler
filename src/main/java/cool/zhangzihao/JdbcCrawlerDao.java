@@ -70,7 +70,7 @@ public class JdbcCrawlerDao implements CrawlerDao {
     }
 
     @Override
-    public String getNextBeProcessedLinkFromDatabase() {
+    public synchronized String getNextBeProcessedLinkFromDatabase() {
         try (
                 PreparedStatement preparedStatement = connection.prepareStatement("select LINK from LINKS_TO_BE_PROCESSED limit 1;");
                 ResultSet resultSet = preparedStatement.executeQuery()) {
