@@ -2,7 +2,6 @@ package cool.zhangzihao;
 
 import org.jsoup.nodes.Document;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface CrawlerConfig {
@@ -28,11 +27,11 @@ public interface CrawlerConfig {
     void onCrawlerComplete();
 
     /**
-     * 从待处理池子中取出元素的回调
+     * 获得下一个即将被处理的链接
      *
-     * @param link 链接
+     * @return 链接
      */
-    void onPollLink(String link);
+    String pullNextBeProcessedLink();
 
     /**
      * 保存已处理过的链接
@@ -42,13 +41,6 @@ public interface CrawlerConfig {
     void onPutProcessedLink(String link);
 
     void onPutAllHrefsToBeProcessedPoll(List<String> links);
-
-    /**
-     * 获取初始化要处理的链接
-     *
-     * @return 要处理的链接的集合
-     */
-    Collection<String> getInitToBeProcessedLinks();
 
     /**
      * 判断这个链接是否被处理过

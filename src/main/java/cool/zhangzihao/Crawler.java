@@ -11,7 +11,6 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 public class Crawler {
@@ -23,26 +22,20 @@ public class Crawler {
 
     public void start() {
         try {
-            while (true) {
-                LinkedList<String> linksPool = new LinkedList<>(this.crawlerConfig.getInitToBeProcessedLinks());
-                if (linksPool.isEmpty()) {
-                    break;
-                }
-                String link = this.getFirstLinkAndRemoveIt(linksPool);
-                if (crawlerConfig.isLinkProcessed(link)) {
+            String beProcessedLink;
+            while ((beProcessedLink = crawlerConfig.pullNextBeProcessedLink()) != null) {
+                if (crawlerConfig.isLinkProcessed(beProcessedLink)) {
                     continue;
                 }
-                if (crawlerConfig.isTargetPage(link)) {
-                    String pageHtmlData = this.getPageData(link);
+                if (crawlerConfig.isTargetPage(beProcessedLink)) {
+                    String pageHtmlData = this.getPageData(beProcessedLink);
                     if (pageHtmlData != null) {
                         Document document = Jsoup.parse(pageHtmlData);
                         this.saveAllHrefsInPage(document);
-                        crawlerConfig.onParsePage(document, link);
+                        crawlerConfig.onParsePage(document, beProcessedLink);
                     }
-                    this.putLinkToProcessedPool(link);
-                    continue;
                 }
-                this.putLinkToProcessedPool(link);
+                this.putLinkToProcessedPool(beProcessedLink);
             }
         } finally {
             crawlerConfig.onCrawlerComplete();
@@ -73,11 +66,5 @@ public class Crawler {
 
     public void putLinkToProcessedPool(String link) {
         crawlerConfig.onPutProcessedLink(link);
-    }
-
-    public String getFirstLinkAndRemoveIt(LinkedList<String> linksPool) {
-        String firstLink = linksPool.remove();
-        crawlerConfig.onPollLink(firstLink);
-        return firstLink;
     }
 }

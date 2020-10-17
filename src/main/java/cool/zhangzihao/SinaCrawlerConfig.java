@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class SinaCrawlerConfig implements CrawlerConfig {
@@ -63,11 +62,27 @@ public class SinaCrawlerConfig implements CrawlerConfig {
         }
     }
 
-    @Override
-    public void onPollLink(String link) {
+    public void deleteLinkFromDB(String link) {
         try (PreparedStatement preparedStatement = connection.prepareStatement("delete from LINKS_TO_BE_PROCESSED where LINK = ?;")) {
             preparedStatement.setString(1, link);
             preparedStatement.executeUpdate();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            throw new RuntimeException(throwables);
+        }
+    }
+
+    @Override
+    public String pullNextBeProcessedLink() {
+        try (
+                PreparedStatement preparedStatement = connection.prepareStatement("select LINK from LINKS_TO_BE_PROCESSED limit 1;");
+                ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                String linkResult = resultSet.getString(1);
+                this.deleteLinkFromDB(linkResult);
+                return linkResult;
+            }
+            return null;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             throw new RuntimeException(throwables);
@@ -92,16 +107,6 @@ public class SinaCrawlerConfig implements CrawlerConfig {
     @Override
     public void onPutAllHrefsToBeProcessedPoll(List<String> links) {
         links.forEach(link -> this.insertLinkToTable("LINKS_TO_BE_PROCESSED", link));
-    }
-
-    @Override
-    public Collection<String> getInitToBeProcessedLinks() {
-        try {
-            return getLinksFromDB(connection, "LINKS_TO_BE_PROCESSED");
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            throw new RuntimeException();
-        }
     }
 
     @Override
