@@ -13,14 +13,15 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.stream.Collectors;
 
-public class Crawler {
+public class Crawler extends Thread {
     private final CrawlerConfig crawlerConfig;
 
     public Crawler(CrawlerConfig crawlerConfig) {
         this.crawlerConfig = crawlerConfig;
     }
 
-    public void start() {
+    @Override
+    public void run() {
         try {
             String beProcessedLink;
             while ((beProcessedLink = crawlerConfig.pullNextBeProcessedLink()) != null) {
@@ -45,7 +46,13 @@ public class Crawler {
     public void saveAllHrefsInPage(Document document) {
         crawlerConfig.onPutAllHrefsToBeProcessedPoll(
                 document.select("a").stream()
-                        .map(element -> element.attr("href"))
+                        .map(element -> {
+                            final String href = element.attr("href");
+                            if (href.startsWith("//")) {
+                                return "https:" + href;
+                            }
+                            return href;
+                        })
                         .filter(hrefString -> !hrefString.toLowerCase().equals("javascript:void(0)"))
                         .collect(Collectors.toList())
         );

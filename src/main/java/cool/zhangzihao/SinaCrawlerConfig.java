@@ -20,7 +20,8 @@ public class SinaCrawlerConfig implements CrawlerConfig {
         Element articleElement = document.selectFirst(".art_content");
         if (articleElement != null) {
             Element titleElement = document.selectFirst(".art_tit_h1");
-            dao.insertNewsToDatabase(titleElement.text(), articleElement.text(), link);
+            String titleContent = titleElement != null ? titleElement.text() : "无标题";
+            dao.insertNewsToDatabase(titleContent, articleElement.text(), link);
             System.out.println(articleElement.text());
         }
     }
